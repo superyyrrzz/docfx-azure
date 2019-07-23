@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/urfave/cli"
 )
@@ -46,5 +47,10 @@ func main() {
 func deploy(c *cli.Context) {
 	fmt.Println("deploying ...")
 	fmt.Println("subscription id:", c.String("subscription-id"))
+	out, err := exec.Command("cmd", "/c", "az account list --output table").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("subscriptions: %s\n", out)
 	fmt.Println("Complete!")
 }
