@@ -52,10 +52,6 @@ func commands() {
 					Name:  "service-connection",
 					Usage: "service connection to Azure in Azure DevOps (required)",
 				},
-				cli.BoolFlag{
-					Name:  "skip-storage",
-					Usage: "skip creating storage account",
-				},
 			},
 		},
 	}
@@ -80,23 +76,24 @@ func deploy(c *cli.Context) {
 	conn := getFlag(c, "service-connection")
 
 	storage := fmt.Sprintf("%sdocfxsite", name)
-	if c.Bool("skip-storage") {
-		fmt.Println("Skip deploying storage account")
-	} else {
-		deployStorage(storage, group, sub)
-	}
+	site := deployStorage(storage, group, sub)
+	repo := deployRepoAndPipeline(name, org, proj, conn, storage)
 
-	deployRepoAndPipeline(name, org, proj, conn, storage)
+	fmt.Println("")
+	fmt.Println("All set! Wait a few minutes for your site's first build, then visit", site)
+	fmt.Println("Your future changes in this created repository will be published automatically:", repo)
 }
 
-func deployStorage(name string, group string, subscription string) {
+func deployStorage(name string, group string, subscription string) string {
 	fmt.Println("Deploying storage...")
 	execute(fmt.Sprintf("az storage account create -n %s -g %s --subscription %s --kind StorageV2", name, group, subscription))
 	execute(fmt.Sprintf("az storage blob service-properties update --account-name %s --static-website --index-document index.html", name))
 	fmt.Println("Finish deploying storage.")
+
+	return strings.TrimSpace(execute(fmt.Sprintf("az storage account show -n %s -g %s --query primaryEndpoints.web --output tsv", name, group)))
 }
 
-func deployRepoAndPipeline(name string, organization string, project string, connection string, storage string) {
+func deployRepoAndPipeline(name string, organization string, project string, connection string, storage string) string {
 	fmt.Println("Creating repository...")
 	execute(fmt.Sprintf("az repos create --name %s --org %s -p %s", name, organization, project))
 	dir := cloneTemplateRepo()
@@ -111,6 +108,7 @@ func deployRepoAndPipeline(name string, organization string, project string, con
 	fmt.Println("Finish creating pipeline.")
 
 	os.Remove(dir)
+	return remote
 }
 
 func cloneTemplateRepo() string {
