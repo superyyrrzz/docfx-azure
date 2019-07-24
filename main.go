@@ -86,7 +86,7 @@ func deploy(c *cli.Context) {
 		deployStorage(storage, group, sub)
 	}
 
-	deployRepo(name, org, proj, conn, storage)
+	deployRepoAndPipeline(name, org, proj, conn, storage)
 }
 
 func deployStorage(name string, group string, subscription string) {
@@ -96,7 +96,7 @@ func deployStorage(name string, group string, subscription string) {
 	fmt.Println("Finish deploying storage.")
 }
 
-func deployRepo(name string, organization string, project string, connection string, storage string) {
+func deployRepoAndPipeline(name string, organization string, project string, connection string, storage string) {
 	fmt.Println("Creating repository...")
 	execute(fmt.Sprintf("az repos create --name %s --org %s -p %s", name, organization, project))
 	dir := cloneTemplateRepo()
@@ -104,6 +104,13 @@ func deployRepo(name string, organization string, project string, connection str
 	remote := fmt.Sprintf("%s/%s/_git/%s", organization, project, name)
 	pushRepo(dir, remote)
 	fmt.Println("Finish creating repository.")
+
+	fmt.Println("Creating pipeline...")
+	pipeline := fmt.Sprintf("%s-site-CI-CD", name)
+	createPipeline(dir, pipeline, name)
+	fmt.Println("Finish creating pipeline.")
+
+	os.Remove(dir)
 }
 
 func cloneTemplateRepo() string {
@@ -147,6 +154,22 @@ func pushRepo(dir string, remote string) {
 	}
 }
 
+func createPipeline(dir string, name string, repoName string) {
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = os.Chdir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	execute(fmt.Sprintf("az pipelines create --name %s --description docfx-azure-pipeline --repository %s --branch master --repository-type tfsgit --yml-path azure-pipelines.yml", name, repoName))
+	err = os.Chdir(wd)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func getFlag(c *cli.Context, flag string) string {
 	result := c.String(flag)
 	if result == "" {
@@ -164,14 +187,3 @@ func execute(str string) string {
 	}
 	return fmt.Sprintf("%s\n", stdoutStderr)
 }
-
-/*
-func execute(command string) string {
-	fmt.Println(command)
-	out, err := exec.Command("cmd", "/c", command).Output()
-	if err != nil {
-		log.Fatal(fmt.Sprintf("%s: %s", err, out))
-	}
-	return fmt.Sprintf("%s", out)
-}
-*/
