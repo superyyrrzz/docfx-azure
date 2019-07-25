@@ -80,7 +80,8 @@ func deploy(c *cli.Context) {
 	repo := deployRepoAndPipeline(name, org, proj, conn, storage)
 
 	fmt.Println("")
-	fmt.Println("All set! Wait a few minutes for your site's first build, then visit", site)
+	fmt.Println("All set!")
+	fmt.Println("Wait a few minutes for your site's first build, then visit", site)
 	fmt.Println("Your future changes in this created repository will be published automatically:", repo)
 }
 
