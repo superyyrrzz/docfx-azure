@@ -8,19 +8,18 @@ docfx-azure deploy --resource-group {RES} --subscription-id {SUB} --organization
 
 ## Prerequisites
 
-* local:
+* local tools:
   * git.exe
-  * Azure CLI: Use to manage Azure resource. Ensure Azure DevOps extension installed:
+  * Azure CLI: Use to manage Azure resource. Ensure Azure DevOps extension installed, and already signed in:
 
     ```cli
+    az login
     az extension add --name azure-devops
     ```
 
-* service:
-  * Azure subsciption / resource group
-  * Azure DevOps / organization / project
-    * Service connection to subscription established
-    * Azure Repos / Azure Pipeline enabled
+* existing service:
+  * Azure subsciption
+  * Azure DevOps
 
 ## What this tool do
 
