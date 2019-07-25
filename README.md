@@ -1,5 +1,11 @@
 # docfx-azure
 
+## Usage
+
+```
+docfx-azure deploy --resource-group {RES} --subscription-id {SUB} --organization-uri {ORG} --project {PROJ} --service-connection {CONN} --name {NAME}
+```
+
 ## Prerequisites
 
 * local:
