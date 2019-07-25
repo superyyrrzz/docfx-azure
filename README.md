@@ -1,5 +1,7 @@
 # docfx-azure
 
+[![Build Status](https://dev.azure.com/renzeyu/docfx-azure/_apis/build/status/docfx-azure.CI?branchName=master)](https://dev.azure.com/renzeyu/docfx-azure/_build/latest?definitionId=7&branchName=master)
+
 ## Usage
 
 ```
