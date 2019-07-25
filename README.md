@@ -15,8 +15,9 @@ docfx-azure deploy --resource-group {RES} --subscription-id {SUB} --organization
   * Azure CLI: Used to manage Azure resource. Ensure Azure DevOps extension installed, and already signed in:
 
     ```cli
-    az login
     az extension add --name azure-devops
+    az login
+    az account set -s SUB-NAME_OR_ID
     ```
 
 * existing service:
