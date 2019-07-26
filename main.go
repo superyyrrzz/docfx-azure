@@ -85,7 +85,7 @@ func deploy(c *cli.Context) {
 	fmt.Println("Your future changes in this created repository will be published automatically:", repo)
 }
 
-func deployStorage(name string, group string, subscription string) string {
+func deployStorage(name , group , subscription string) string {
 	fmt.Println("Deploying storage...")
 	execute(fmt.Sprintf("az storage account create -n %s -g %s --subscription %s --kind StorageV2", name, group, subscription))
 	execute(fmt.Sprintf("az storage blob service-properties update --account-name %s --static-website --index-document index.html", name))
@@ -94,7 +94,7 @@ func deployStorage(name string, group string, subscription string) string {
 	return strings.TrimSpace(execute(fmt.Sprintf("az storage account show -n %s -g %s --query primaryEndpoints.web --output tsv", name, group)))
 }
 
-func deployRepoAndPipeline(name string, organization string, project string, connection string, storage string) string {
+func deployRepoAndPipeline(name , organization , project , connection , storage string) string {
 	fmt.Println("Creating repository...")
 	execute(fmt.Sprintf("az repos create --name %s --org %s -p %s", name, organization, project))
 	dir := cloneTemplateRepo()
@@ -121,7 +121,7 @@ func cloneTemplateRepo() string {
 	return dir
 }
 
-func updateTemplateRepo(dir string, connection string, storage string) {
+func updateTemplateRepo(dir , connection , storage string) {
 	path := filepath.Join(dir, "azure-pipelines.yml")
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -134,7 +134,7 @@ func updateTemplateRepo(dir string, connection string, storage string) {
 	}
 }
 
-func pushRepo(dir string, remote string) {
+func pushRepo(dir , remote string) {
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -153,7 +153,7 @@ func pushRepo(dir string, remote string) {
 	}
 }
 
-func createPipeline(dir string, name string, repoName string) {
+func createPipeline(dir , name , repoName string) {
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
